@@ -13,8 +13,12 @@ int closed = 83;
 int openedLeft = 98;
 int openedRight = 68;
 
-// Activators & Pins
+// Pins
 int infraredSensorPin = 12;
+int gateServoPin = 7;
+int sorterServoPin = 8;
+
+// Activators
 int gateOpenLeftActivatorPin = 4;
 int gateOpenRightActivatorPin = 5;
 int sortingActivatorPin = 10;
@@ -35,8 +39,6 @@ int gateState = 0; // 0: Closed; 1: Open Left; 2: Open Right
 bool sortingActivated = false;
 int iteration = 2;
 int delayTime = 300;
-// TODO: When receiving a signal, keep the circuit working. 
-// Connect power between boards and use a transistor to send signal from ESP32
 
 void setup() {
   Serial.begin(9600);
@@ -44,12 +46,12 @@ void setup() {
   pinMode(infraredSensorPin, INPUT); // Infrared sensor
 
   // Sorter Setup
-  ballSorter.attach(8);
+  ballSorter.attach(sorterServoPin);
   ballSorter.write(home);
   sortPos = home;
 
   // Gate Setup
-  gate.attach(7);
+  gate.attach(gateServoPin);
   gate.write(closed);
   gatePos = closed;
 
@@ -75,11 +77,6 @@ void loop() {
   if(sortingActivated) { // Sorting Logic
     int isBlack;
     isBlack = digitalRead(infraredSensorPin);
-
-    /* Serial.println();
-    Serial.print("Black: ");
-    Serial.print(isBlack);
-    Serial.println(); */
 
     if(isBlack) {
       ballSorter.write(left);
